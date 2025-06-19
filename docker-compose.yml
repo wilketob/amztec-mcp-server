@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  amazon-mcp-server:
+    build: .
+    container_name: amazon-mcp-server
+    restart: unless-stopped
+    environment:
+      - MCP_HOST=0.0.0.0
+      - MCP_PORT=8000
+      - AMAZON_REFRESH_TOKEN=${AMAZON_REFRESH_TOKEN}
+      - AMAZON_LWA_APP_ID=${AMAZON_LWA_APP_ID}
+      - AMAZON_LWA_CLIENT_SECRET=${AMAZON_LWA_CLIENT_SECRET}
+      - AMAZON_AWS_ACCESS_KEY=${AMAZON_AWS_ACCESS_KEY}
+      - AMAZON_AWS_SECRET_KEY=${AMAZON_AWS_SECRET_KEY}
+      - AMAZON_ROLE_ARN=${AMAZON_ROLE_ARN}
+      - SELLER_ID=${SELLER_ID}
+    env_file:
+      - .env
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: amazon-mcp-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      amazon-mcp-server:
+        condition: service_healthy
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  ssl-certs:

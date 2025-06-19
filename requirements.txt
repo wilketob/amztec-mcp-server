@@ -1,0 +1,18 @@
+# Core MCP and Amazon SP API dependencies
+mcp[cli]>=1.9.3
+python-amazon-sp-api>=1.9.36
+python-dotenv>=1.1.0
+
+# HTTP server dependencies  
+httpx>=0.25.0
+uvicorn>=0.24.0
+fastapi>=0.104.0
+starlette>=0.27.0
+
+# Authentication dependencies
+PyJWT>=2.8.0
+cryptography>=41.0.0
+
+# Additional utilities
+pydantic>=2.4.0
+aiofiles>=23.2.0
